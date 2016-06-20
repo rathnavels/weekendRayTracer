@@ -23,6 +23,7 @@ hitable_list *world;
 Camera cam;
 float tmin, tmax;
 
+//Gonna commit this guy
 
 vec3 random_in_unit_sphere()
 {
