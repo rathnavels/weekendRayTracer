@@ -28,10 +28,10 @@ float tmin, tmax;
 vec3 random_in_unit_sphere()
 {
 	vec3 p;
-//	do
-//	{
+	do
+	{
 		p = 2.0f * vec3((float)(rand() / (RAND_MAX + 1)), (float)(rand() / (RAND_MAX + 1)), (float)(rand() / (RAND_MAX + 1))) - vec3(1.0, 1.0, 1.0);
-//	} while (p.length() >= 1);
+	} while (p.length() >= 1);
 	return p;
 }
 
@@ -44,7 +44,7 @@ vec3 colorFunc(Ray ray, hitable_list *world)
 		return 0.5f * colorFunc(Ray(rec.hitPoint, target-rec.hitPoint),world);
 	}
 	else
-		return vec3(0, 0, 0);
+		return vec3(0.8, 0.8, 0.8);
 }
 
 void setPixels()
