@@ -26,6 +26,8 @@ using namespace glm;
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#define nSamples 8
+
 
 int width, height;
 unsigned char *pixmap;
@@ -77,24 +79,24 @@ void save_screenshot(string filename, int w, int h)
 	
 }
 
-//Gonna commit this guy
-
-vec3 random_in_unitSphere()
-{
-	vec3 p;
-	p = (2.0f * vec3(((float)(rand()) / (RAND_MAX+1)), ((float)(rand()) / (RAND_MAX+1)), ((float)(rand()) / (RAND_MAX+1)))) - vec3(1.0, 1.0, 1.0);
-	return p;
-}
 
 
-
-vec3 colorFunc(Ray ray, hitable_list *world)
+vec3 colorFunc(Ray ray, hitable_list *world, int depth)
 {
 	hitRecord  rec;
 	if (world->hit(ray, 0.001, FLT_MAX, rec))
 	{
+		Ray scattered;
+		vec3 attenuation;
 		vec3 target = rec.hitPoint + rec.normal + random_in_unitSphere();
-		return 0.5f * colorFunc(Ray(rec.hitPoint, target-rec.hitPoint),world);
+		if (depth < 50 && rec.mat_ptr->scatter(ray, rec, attenuation, scattered))
+		{
+			return attenuation * colorFunc(scattered, world, depth + 1);
+		}
+		else
+		{
+			return vec3(0, 0, 0);
+		}
 	}
 	else
 		return vec3(0.6, 0.6, 0.85);
@@ -108,7 +110,7 @@ void setPixels()
 	vec3 lowerLeft = vec3(-1.6, -0.9, -1.0);
 	vec3 vertical = vec3(0, 1.8, 0);
 	vec3 horizontal = vec3(3.2, 0, 0);
-	int nSamples = 1;
+
 	
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
@@ -116,11 +118,11 @@ void setPixels()
 				vec3 temp = vec3(0., 0., 0.);
 				for (int k = 0; k < nSamples; k++)
 				{
-					float v = (float)(y+ (float)(rand() / RAND_MAX + 1)) / float(height);
-					float u = (float)(x + (float)(rand() / RAND_MAX + 1)) / float(width);
-
+					float v = (float)(y+ (float)(rand()) / RAND_MAX) / (float)height;
+					float u = (float)(x + (float)(rand()) / RAND_MAX) / (float)width;
+				
 				Ray r=cam.getRay(u, v);
-				color += colorFunc(r,world);
+				color += colorFunc(r,world,0);
 				
 			}
 				color /= (float)nSamples;
@@ -174,12 +176,11 @@ int main(int argc, char *argv[])
 	pixmap = new unsigned char[width * height * 3];
 
 	hitable *list[2];
-	list[0] = new Sphere(vec3(0, 0, -1), 0.3);
-	list[1] = new Plane(vec3(0, -0.3, -1), vec3(0,1,0));
+	list[0] = new Sphere(vec3(0, 0, -1), 0.3, new Lambertian(vec3(0.7,0.2,0.2)));
+	list[1] = new Plane(vec3(0, -0.3, -1), vec3(0,1,0), new Metal(vec3(0.2,0.8,0.1)));
 	world = new hitable_list(list, 2);
 
 	setPixels();
-
 
 
 

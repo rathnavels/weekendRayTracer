@@ -9,9 +9,10 @@ class Plane : public hitable
 {
 public:
 	Plane(){}
-	Plane(vec3 point, vec3 normal) : Point(point), Normal(normal){};
+	Plane(vec3 point, vec3 normal, Material *mptr) : Point(point), Normal(normal), mat_ptr(mptr){};
 	virtual bool hit(Ray ray, float t_min, float t_max, hitRecord& record);
 	vec3 Point, Normal;
+	Material *mat_ptr;
 
 };
 
@@ -28,6 +29,7 @@ bool Plane::hit(Ray ray, float t_min, float t_max, hitRecord& record)
 		record.t = temp;
 		record.hitPoint = ray.point_at_parameter(record.t);
 		record.normal = Normal;
+		record.mat_ptr = this->mat_ptr;
 		return true;
 	}
 	return false;

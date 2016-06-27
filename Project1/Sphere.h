@@ -17,12 +17,13 @@ class Sphere  : public hitable
 {
 public:
 	Sphere(){  }
-	Sphere(vec3 cen, float r) :center(cen), radius(r){};
+	Sphere(vec3 cen, float r, Material *mptr) :center(cen), radius(r), mat_ptr(mptr){};
 	virtual bool hit(Ray ray, float t_min, float t_max, hitRecord& rec);
 	vec3 center;
 	float radius;
 	vec3 emission, color;
 	Refl_t refl_t;
+	Material *mat_ptr;
 
 
 };
@@ -45,6 +46,7 @@ bool Sphere::hit(Ray ray, float t_min, float t_max, hitRecord& rec)
 			rec.t = temp;
 			rec.hitPoint = ray.point_at_parameter(rec.t);
 			rec.normal = (rec.hitPoint - center) / radius;
+			rec.mat_ptr = this->mat_ptr;
 			return true;
 		}
 		temp = (-B + sqrt(rootPart)) / (2 * A);
@@ -53,6 +55,7 @@ bool Sphere::hit(Ray ray, float t_min, float t_max, hitRecord& rec)
 			rec.t = temp;
 			rec.hitPoint = ray.point_at_parameter(rec.t);
 			rec.normal = (rec.hitPoint - center) / radius;
+			rec.mat_ptr = this->mat_ptr;
 			return true;
 		}
 	}

@@ -26,6 +26,7 @@ bool hitable_list::hit(Ray ray, float tmin, float tmax, hitRecord& rec)
 			hitAnything = true;
 			closest_so_far = tempRec.t;
 			rec = tempRec;
+
 		}
 	}
 	return hitAnything;
