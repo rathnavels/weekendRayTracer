@@ -4,6 +4,7 @@
 #include "Ray.h"
 
 class Material;
+#define PI 3.1415926536
 
 struct hitRecord
 {
@@ -40,6 +41,15 @@ vec3 random_in_unitSphere()
 	return p;
 }
 
+vec3 unitVec_hemisphere(double u1, double u2)
+{
+	vec3 p;
+	float r = sqrt(1.0f - u1*u2);
+	float phi = 2 * PI * u2;
+	p = vec3(cos(phi)*r, sin(phi)*r, u1);
+	return p;
+}
+
 class Lambertian : public Material
 {
 public:
@@ -47,6 +57,7 @@ public:
 	virtual bool scatter(Ray& r_in, hitRecord& rec, vec3& attenuation, Ray& scattered)
 	{
 		vec3 target = rec.hitPoint + rec.normal + random_in_unitSphere();
+		//vec3 target = unitVec_hemisphere(((float)(rand()) / (RAND_MAX + 1)), ((float)(rand()) / (RAND_MAX + 1))) - rec.hitPoint;
 		scattered = Ray(rec.hitPoint, target-rec.hitPoint);
 		attenuation = albedo;
 		return true;
@@ -69,5 +80,19 @@ public:
 	vec3 albedo;
 };
 
+
+class GlossyMetal : public Material
+{
+public:
+	GlossyMetal(vec3& a) : albedo(a) {}
+	virtual bool scatter(Ray& r_in, hitRecord& rec, vec3& attenuation, Ray& scattered)
+	{
+		vec3 reflected = reflect(normalize(r_in.D), rec.normal);
+		scattered = Ray(rec.hitPoint, reflected+ 0.2f * random_in_unitSphere());
+		attenuation = albedo;
+		return (dot(scattered.D, rec.normal) > 0);
+	}
+	vec3 albedo;
+};
 
 #endif
