@@ -27,11 +27,11 @@ using namespace glm;
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#define nSamples 15
+#define nSamples 100
 #define FOV 90
-#define DEPTH 20
-#define width 400
-#define height 400
+#define DEPTH 50
+#define width 700
+#define height 700
 
 
 
@@ -63,14 +63,17 @@ void save_screenshot(string filename, int w, int h)
 		GL_BGR_EXT, GL_UNSIGNED_BYTE, dataBuffer);
 
 	int timest = (unsigned)time(NULL);
-	string ts,ts1;         
-	ostringstream convert, convert1;  
+	string ts,ts1,ts2;         
+	ostringstream convert, convert1, convert2;  
 	convert << timest;     
 	ts = convert.str();
 	seconds = (int)RUNTIME_SECONDS;
 	convert1 << RUNTIME_SECONDS;
 	ts1 = convert1.str();
-	filename = filename + "_" + ts + "_" + ts1 + "s" + ".tga";
+	int samples = nSamples;
+	convert2 << samples;
+	ts2 = convert2.str();
+	filename = filename + "_" + ts + "_" + ts1 + "s" + "_" + ts2 + "samples" + ".tga";
 	FILE *filePtr = fopen(filename.c_str(), "wb");
 	if (!filePtr) return;
 
@@ -101,17 +104,18 @@ vec3 colorFunc(Ray ray, hitable_list *world, int depth)
 		Ray scattered;
 		vec3 attenuation;
 		vec3 target = rec.hitPoint + rec.normal + random_in_unitSphere();
+		vec3 emitted = rec.mat_ptr->emitted(0, 0, rec.hitPoint);
 		if (depth < DEPTH && rec.mat_ptr->scatter(ray, rec, attenuation, scattered))
 		{
-			return attenuation * colorFunc(scattered, world, depth + 1);
+			return emitted + attenuation * colorFunc(scattered, world, depth + 1);
 		}
 		else
 		{
-			return vec3(0, 0, 0);
+			return emitted;
 		}
 	}
 	else
-		return vec3(0.85, 0.85, 0.85);
+		return vec3(0,0,0);
 }
 
 void setPixels()
@@ -120,10 +124,7 @@ void setPixels()
 	t1 = clock();
 	Ray ray;
 	vec3 color;
-	//vec3 origin = vec3(0, 0, 0);
-	//vec3 lowerLeft = vec3(-1.6, -0.9, -1.0);
-	//vec3 vertical = vec3(0, 1.8, 0);
-	//vec3 horizontal = vec3(3.2, 0, 0);
+
 
 	
 		for (int y = 0; y < height; y++) {
@@ -188,20 +189,38 @@ static void init(void)
 int main(int argc, char *argv[])
 {
 	pixmap = new unsigned char[width * height * 3];
+
+	//Setup Camera
 	vec3 lookFrom, lookAt, cameraUp;
 	lookFrom = vec3(0, 0, 0);
 	lookAt = vec3(0, 0, -1);
 	cameraUp = vec3(0, 1, 0);
 	float flen = (lookFrom - lookAt).length();
 	cam = new Camera(FOV, (float)width / height, lookFrom, lookAt, cameraUp, flen, 100);
-	hitable *list[4];
-	list[0] = new Sphere(vec3(0, 0, -1.5), 0.3, new Lambertian(vec3(0.8, 0.2, 0.2)));
-	list[2] = new Sphere(vec3(-.6, 0, -1.5), 0.3, new GlossyMetal(vec3(0.2, 0.8, 0.2)));
-	list[3] = new Sphere(vec3(0.6, 0, -1.5), 0.3, new Metal(vec3(0.2, 0.2, 0.8)));
-	list[1] = new Plane(vec3(0, -0.3, -1), vec3(0, 1, 0), new Lambertian(vec3(0.7, 0.7, 0.7)));
-	//world = new hitable_list(list, 4);
 
-	vec3 A, B, C, D, E, F, G, H;
+	//Setup Scene
+	hitable *list[5];
+	Texture *constant1 = new constant_texture(vec3(0.9, 0.9, 0.9));
+	Texture *constant5 = new constant_texture(vec3(4,4,4));
+	Texture *constant2 = new constant_texture(vec3(0.6, 0.2, 0.6));
+	Texture *constant3 = new constant_texture(vec3(0.35, 0.1, 0.1));
+	Texture *constant4 = new constant_texture(vec3(0.1, 0.35, 0.1));
+	Texture *checker1 = new checker_texture(constant1, constant2, 7);
+	Texture *checker2 = new checker_texture(constant4, constant3, 55);
+	//list[0] = new Sphere(vec3(0, 0, -1.5), 0.3, new Lambertian(vec3(0.8, 0.2, 0.2)));
+	list[0] = new Sphere(vec3(0, 0, -1.5), 0.3, new Dielectric(1.3));
+	//list[2] = new Sphere(vec3(-.6, 0, -1.5), 0.3, new GlossyMetal(vec3(0.2, 0.8, 0.2)));
+	list[2] = new Sphere(vec3(-.6, 0, -1.5), 0.3, new diffuse_light(constant1));
+	//list[3] = new Sphere(vec3(0.6, 0, -1.5), 0.3, new Metal(vec3(0.2, 0.2, 0.8)));
+	list[3] = new Sphere(vec3(0.6, 0, -1.5), 0.3, new diffuse_light(constant1));
+	list[4] = new Sphere(vec3(0., -0.2, -0.9), 0.1, new Lambertian(checker2));
+	//list[4] = new Sphere(vec3(0., -0.2, -0.9), 0.1, new diffuse_light(constant1));
+	list[1] = new Plane(vec3(0, -0.3, -1), vec3(0, 1, 0), new Lambertian(checker1));
+	//list[4] = new Sphere(vec3(0, 0, -0.8), 0.2, new Dielectric(1.5));
+	
+	//world = new hitable_list(list, 5);
+
+	vec3 A, B, C, D, E, F, G, H, Ci, Gi, Di, Hi;
 	A = vec3(-0.6, -0.6, -0.8);
 	B = vec3(0.6, -0.6, -0.8);
 	C = vec3(-0.6, 0.6, -0.8);
@@ -211,28 +230,36 @@ int main(int argc, char *argv[])
 	G = vec3(-0.6, 0.6, -1.6);
 	H = vec3(0.6, 0.6, -1.6);
 
-	hitable *cornelBox[10];
+	Ci = vec3(-0.3, 0.6, -1.1);
+	Di = vec3(0.3, 0.6, -1.1);
+	Gi = vec3(-0.3, 0.6, -1.3);
+	Hi = vec3(0.3, 0.6, -1.3);
+
+	hitable *cornelBox[12];
 	//Bottom
-	cornelBox[0] = new Triangle(E, A, B, new Lambertian(vec3(0.9, 0.9, 0.9)));
-	cornelBox[1] = new Triangle(E, B, F, new Lambertian(vec3(0.9, 0.9, 0.9)));
+	cornelBox[0] = new Triangle(E, A, B, new Lambertian(new constant_texture(vec3(0.9, 0.9, 0.9))));
+	cornelBox[1] = new Triangle(E, B, F, new Lambertian(new constant_texture(vec3(0.9, 0.9, 0.9))));
 
 	//Top
-	cornelBox[2] = new Triangle(C, G, D, new Lambertian(vec3(0.9, 0.9, 0.9)));
-	cornelBox[3] = new Triangle(G, H, D, new Lambertian(vec3(0.9, 0.9, 0.9)));
+	cornelBox[2] = new Triangle(C, G, D, new Lambertian(new constant_texture(vec3(0.9, 0.9, 0.9))));
+	cornelBox[3] = new Triangle(G, H, D, new Lambertian(new constant_texture(vec3(0.9, 0.9, 0.9))));
+
+	cornelBox[10] = new Triangle(Ci, Gi, Di, new diffuse_light(constant1));
+	cornelBox[11] = new Triangle(Gi, Hi, Di, new diffuse_light(constant1));
 
 	//Left
-	cornelBox[4] = new Triangle(A, C, G, new Lambertian(vec3(0.8, 0.2, 0.2)));
-	cornelBox[5] = new Triangle(A, G, E, new Lambertian(vec3(0.8, 0.2, 0.2)));
+	cornelBox[4] = new Triangle(A, C, G, new Lambertian(new constant_texture(vec3(0.8, 0.2, 0.2))));
+	cornelBox[5] = new Triangle(A, G, E, new Lambertian(new constant_texture(vec3(0.8, 0.2, 0.2))));
 
 	//Right
-	cornelBox[6] = new Triangle(B, D, H, new Lambertian(vec3(0.2, 0.2, 0.8)));
-	cornelBox[7] = new Triangle(H, F, B, new Lambertian(vec3(0.2, 0.2, 0.8)));
+	cornelBox[6] = new Triangle(B, D, H, new Lambertian(new constant_texture(vec3(0.2, 0.2, 0.8))));
+	cornelBox[7] = new Triangle(H, F, B, new Lambertian(new constant_texture(vec3(0.2, 0.2, 0.8))));
 
 	//Back
-	cornelBox[8] = new Triangle(G, E, F, new Lambertian(vec3(0.9, 0.9, 0.9)));
-	cornelBox[9] = new Triangle(F, H, G, new Lambertian(vec3(0.9, 0.9, 0.9)));
+	cornelBox[8] = new Triangle(G, E, F, new Lambertian(new constant_texture(vec3(0.9, 0.9, 0.9))));
+	cornelBox[9] = new Triangle(F, H, G, new Lambertian(new constant_texture(vec3(0.9, 0.9, 0.9))));
 
-	world = new hitable_list(cornelBox, 10);
+	world = new hitable_list(cornelBox, 12);
 
 	setPixels();
 

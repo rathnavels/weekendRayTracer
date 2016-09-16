@@ -34,9 +34,6 @@ public:
 		w = normalize(lookFrom - lookAt);
 		u = normalize(cross(vup, w));
 		v = normalize(cross(w, u));
-		/*vertical = vec3(0.0, 2 * halfHeight, 0.0);
-		horizontal = vec3(2 * halfWidth, 0.0, 0.0);
-		lower_left_corner = vec3(-halfWidth, -halfHeight, -1.0);*/
 		lower_left_corner = origin - halfWidth*u*focalLength - halfHeight*v*focalLength - w*focalLength;
 		horizontal = 2 * halfWidth * u * focalLength;
 		vertical = 2 * halfHeight * v * focalLength;

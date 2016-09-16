@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WeekendRayTracer", "WeekendRayTracer\WeekendRayTracer.vcxproj", "{4BB93864-A7E1-4CAA-A742-FBF74154A626}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tester", "Tester\Tester.vcxproj", "{5037E3E8-9D32-4B8E-BF54-3A4EF50CFAD4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SmallPt", "Project1\Project1.vcxproj", "{391EBA84-15C6-44ED-BCB6-7AACCFC66F73}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WRT", "Project1\Project1.vcxproj", "{391EBA84-15C6-44ED-BCB6-7AACCFC66F73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +15,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Debug|Win32.Build.0 = Debug|Win32
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Debug|x64.ActiveCfg = Debug|x64
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Debug|x64.Build.0 = Debug|x64
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Release|Win32.ActiveCfg = Release|Win32
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Release|Win32.Build.0 = Release|Win32
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Release|x64.ActiveCfg = Release|x64
-		{4BB93864-A7E1-4CAA-A742-FBF74154A626}.Release|x64.Build.0 = Release|x64
 		{5037E3E8-9D32-4B8E-BF54-3A4EF50CFAD4}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5037E3E8-9D32-4B8E-BF54-3A4EF50CFAD4}.Debug|Win32.Build.0 = Debug|Win32
 		{5037E3E8-9D32-4B8E-BF54-3A4EF50CFAD4}.Debug|x64.ActiveCfg = Debug|x64
