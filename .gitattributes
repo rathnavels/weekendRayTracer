@@ -63,3 +63,4 @@
 #*.RTF   diff=astextplain
 
 static/* linguist-vendored
+*.rb linguist-language=C++
